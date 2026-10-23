@@ -21,6 +21,13 @@ const questions = [
 (async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
+
+    // "npm run seed:if-empty": chỉ tạo dữ liệu khi database chưa có user (dùng cho Render)
+    if (process.argv.includes('--if-empty') && (await User.countDocuments()) > 0) {
+      console.log('Database already has data, skip seeding');
+      return;
+    }
+
     await Promise.all([User.deleteMany({}), Question.deleteMany({}), Quiz.deleteMany({})]);
 
     const hash = await bcrypt.hash('123', 10);
